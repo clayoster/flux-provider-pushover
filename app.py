@@ -16,9 +16,6 @@ EXPECTED_AUTH_TOKEN = PUSHOVER_API_TOKEN
 
 PUSHOVER_URL = "https://api.pushover.net/1/messages.json"
 
-print(PUSHOVER_USER_KEY)
-print(PUSHOVER_API_TOKEN)
-print(EXPECTED_AUTH_TOKEN)
 
 @app.route('/health')
 def healthcheck():
@@ -29,8 +26,6 @@ def webhook():
     # Verify Authorization header
     auth_header = request.headers.get("Authorization")
     if not auth_header or auth_header != f"Bearer {EXPECTED_AUTH_TOKEN}":
-        print(PUSHOVER_API_TOKEN)
-        print(EXPECTED_AUTH_TOKEN)
         return jsonify({"error": "Unauthorized"}), 401
 
     # Parse JSON payload
