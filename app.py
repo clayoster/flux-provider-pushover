@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+"""
+This application acts as middleware to handle sending alerts from FluxCD to Pushover
+"""
+
 import os
 from flask import Flask, request, jsonify
 import requests
@@ -15,14 +19,14 @@ EXPECTED_AUTH_TOKEN = PUSHOVER_API_TOKEN
 # Pushover API
 PUSHOVER_URL = "https://api.pushover.net/1/messages.json"
 
-# Healthcheck route
 @app.route('/health')
 def healthcheck():
+    """ Healthcheck Route """
     return "healthy"
 
-# The main route to the application
 @app.route("/webhook", methods=["POST"])
 def webhook():
+    """ The main route to the application """
     # Verify Authorization header
     auth_header = request.headers.get("Authorization")
     if not auth_header or auth_header != f"Bearer {EXPECTED_AUTH_TOKEN}":
