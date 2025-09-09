@@ -19,6 +19,11 @@ EXPECTED_AUTH_TOKEN = PUSHOVER_API_TOKEN
 # Pushover API
 PUSHOVER_URL = "https://api.pushover.net/1/messages.json"
 
+@app.route('/')
+def bare_request():
+    """ Bare Request Route """
+    return 'Requests need to be made to /webhook', 400
+
 @app.route('/health')
 def healthcheck():
     """ Healthcheck Route """
