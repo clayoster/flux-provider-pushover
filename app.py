@@ -38,19 +38,23 @@ def webhook():
         return jsonify({"error": "Invalid JSON"}), 400
 
     # Extract fields from the FluxCD alert
-    severity = data.get("severity", "info")
-    message = data.get("message", "No message")
-    reason = data.get("reason", "Unknown reason")
+    severity = data.get("severity", "INFO")
+    message = data.get("message", "No Message")
+    reason = data.get("reason", "Unknown")
+    controller = data.get("reportingController", "Unknown")
     metadata = data.get("metadata", {})
-    summary = metadata.get("summary", "FluxCD Alert")
-    revision = metadata.get("revision", "")
+    revision = metadata.get("revision", "Unknown")
+    involvedObject = data.get("involvedObject", {})
+    kind = involvedObject.get("kind", "Unknown")
+    objectName = involvedObject.get("name", "Unknown")
 
-    # Build pushover message
+    # Build Pushover Message
     pushover_message = (
-        f"[{severity.upper()}] {summary}\n"
-        f"Reason: {reason}\n"
-        f"Message: {message}\n"
-        f"Revision: {revision}"
+        f"{reason} [{severity.upper()}]\n"
+        f"{message}\n\n"
+        f"Controller: {controller}\n"
+        f"Object: {kind.lower()}/{objectName}\n"
+        f"Revision: {revision}\n"
     )
 
     # Send to Pushover
