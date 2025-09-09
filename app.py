@@ -68,6 +68,10 @@ def webhook():
         f"Revision: {revision}\n"
     )
 
+    if PUSHOVER_API_TOKEN == 'test_api_token':
+        # This is a test, return success and do not actually send to Pushover
+        return jsonify({"status": "ok"}), 200
+
     # Send to Pushover
     response = requests.post(
         PUSHOVER_URL,
