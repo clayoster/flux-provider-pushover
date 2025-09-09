@@ -5,6 +5,7 @@ This application acts as middleware to handle sending alerts from FluxCD to Push
 """
 
 import os
+import sys
 from flask import Flask, request, jsonify
 import requests
 
@@ -18,6 +19,11 @@ EXPECTED_AUTH_TOKEN = PUSHOVER_API_TOKEN
 
 # Pushover API
 PUSHOVER_URL = "https://api.pushover.net/1/messages.json"
+
+# Test if auth_user and auth_pass have been set and exit if they have not
+if not PUSHOVER_USER_KEY or not PUSHOVER_API_TOKEN:
+    print('Pushover user key or API token is not not configured, exiting app')
+    sys.exit(1)
 
 @app.route('/')
 def bare_request():
