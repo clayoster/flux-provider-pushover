@@ -49,16 +49,16 @@ def webhook():
     controller = data.get("reportingController", "Unknown")
     metadata = data.get("metadata", {})
     revision = metadata.get("revision", "Unknown")
-    involvedObject = data.get("involvedObject", {})
-    kind = involvedObject.get("kind", "Unknown")
-    objectName = involvedObject.get("name", "Unknown")
+    involved_object = data.get("involvedObject", {})
+    kind = involved_object.get("kind", "Unknown")
+    object_name = involved_object.get("name", "Unknown")
 
     # Build Pushover Message
     pushover_message = (
         f"{reason} [{severity.upper()}]\n"
         f"{message}\n\n"
         f"Controller: {controller}\n"
-        f"Object: {kind.lower()}/{objectName}\n"
+        f"Object: {kind.lower()}/{object_name}\n"
         f"Revision: {revision}\n"
     )
 
