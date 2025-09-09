@@ -76,6 +76,8 @@ def webhook():
 
     # If sending to Pushover fails, return HTTP 500 and an error message.
     if response.status_code != 200:
+        print("Error: Failed to send to Pushover")
+        print("Details" + str(response.text))
         return jsonify({"error": "Failed to send to Pushover", "details": response.text}), 500
 
     # Otherwise, return HTTP 200 and "ok"
