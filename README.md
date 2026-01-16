@@ -91,6 +91,7 @@ Example Kubernetes manifest file defining the following items:
 - Ingress (Configured for nginx ingress with example domain "flux-provider-pushover.example.com")
 
 ```yaml
+---
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -99,8 +100,8 @@ metadata:
 apiVersion: v1
 kind: Secret
 metadata:
-    name: flux-provider-pushover
-    namespace: flux-provider-pushover
+  name: flux-provider-pushover
+  namespace: flux-provider-pushover
 type: Opaque
 stringData:
     PUSHOVER_USER_KEY: your_pushover_user_key
@@ -124,34 +125,34 @@ spec:
         app: flux-provider-pushover
     spec:
       containers:
-      - name: flux-provider-pushover
-        image: ghcr.io/clayoster/flux-provider-pushover:latest
-        env:
-          - name: PUSHOVER_USER_KEY
-            valueFrom:
-              secretKeyRef:
-                name: flux-provider-pushover
-                key: PUSHOVER_USER_KEY
-          - name: PUSHOVER_API_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: flux-provider-pushover
-                key: PUSHOVER_API_TOKEN
-        ports:
-          - containerPort: 8080
-            name: 8080tcp
-            protocol: TCP
-        resources: {}
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-            scheme: HTTP
-          initialDelaySeconds: 10
-          periodSeconds: 30
-          successThreshold: 1
-          timeoutSeconds: 3
-          failureThreshold: 3
+        - name: flux-provider-pushover
+          image: ghcr.io/clayoster/flux-provider-pushover:latest
+          env:
+            - name: PUSHOVER_USER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: flux-provider-pushover
+                  key: PUSHOVER_USER_KEY
+            - name: PUSHOVER_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: flux-provider-pushover
+                  key: PUSHOVER_API_TOKEN
+          ports:
+            - containerPort: 8080
+              name: 8080tcp
+              protocol: TCP
+          resources: {}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 3
+            failureThreshold: 3
 ---
 apiVersion: v1
 kind: Service
@@ -175,16 +176,16 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: flux-provider-pushover.example.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: flux-provider-pushover
-            port:
-              number: 80
+    - host: flux-provider-pushover.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: flux-provider-pushover
+                port:
+                  number: 80
 ```
 
 Additional recommendations:
