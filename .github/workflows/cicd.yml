@@ -4,23 +4,40 @@ on: [push]
 
 env:
   PYTHON_VERSION: "3.13"
+  # Define actions as YAML anchors for a single place to manage versions
+  # These aren't actually environment variables, but this is a convenient place to store them for reuse in the workflow steps
+  # actions/checkout v6.0.2
+  ACTION_CHECKOUT: &checkout actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+  # actions/setup-python v6.2.0
+  ACTION_SETUP_PYTHON: &setup-python actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+  # actions/setup-buildx v4.0.0
+  ACTION_DOCKER_SETUP_BUILDX: &docker-setup-buildx docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
+  # actions/login v4.0.0
+  ACTION_DOCKER_LOGIN: &docker-login docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2
+  # actions/metadata v6.0.0
+  ACTION_DOCKER_METADATA: &docker-metadata docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf
+  # actions/build-push v7.0.0
+  ACTION_DOCKER_BUILD_PUSH: &docker-build-push docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: *checkout
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: *setup-python
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: |
+            app-requirements.txt
+            app-dev-requirements.txt
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install --no-cache-dir -r app-requirements.txt -r app-dev-requirements.txt
+          pip install -r app-requirements.txt -r app-dev-requirements.txt
 
       - name: Run pylint
         run: |
@@ -30,17 +47,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: *checkout
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: *setup-python
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: |
+            app-requirements.txt
+            app-dev-requirements.txt
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install --no-cache-dir -r app-requirements.txt -r app-dev-requirements.txt
+          pip install -r app-requirements.txt -r app-dev-requirements.txt
 
       - name: Run pytest
         run: |
@@ -57,13 +77,13 @@ jobs:
       id-token: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: *checkout
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: *docker-setup-buildx
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v4
+        uses: *docker-login
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -71,7 +91,7 @@ jobs:
 
       - name: Extract metadata (tags, labels) for container
         id: meta
-        uses: docker/metadata-action@v6
+        uses: *docker-metadata
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
@@ -81,7 +101,7 @@ jobs:
 
       - name: Build and push container image
         id: push
-        uses: docker/build-push-action@v7
+        uses: *docker-build-push
         with:
           context: .
           push: true
